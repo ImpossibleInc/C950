@@ -3,49 +3,40 @@ class HashMap:
         self.map = [None] * initialCapacity
         self.isFullTable = ["StartEmpty"] * initialCapacity
 
-    def add(self, package):
-        i = 0
-        sectionsChecked = 0
-        N = len(self.map)
-        section = hash(package.idNumber)
+    def insert(self, key, package):
+        section = hash(key) % len(self.list)
+        sectionList = self.list[section]
 
-        while sectionsChecked < N:
-            if self.isFullTable[section] == "StartEmpty" or self.isFullTable[section] == "Removed":
-                self.map[section] = package
-                self.isFullTable[section] = "Filled"
+        for kv in sectionList:
+            if kv[0] == key:
+                kv[1] = package
                 return True
 
-            i += 1
-            section = (hash(package.idNumber) + i ** 2) % N
-            sectionsChecked += 1
-
-        self.resize()
-        self.insert(package)
+        keyValue = [key, package]
+        sectionList.append(keyValue)
         return True
 
     def search(self, key):
-        i = 0
-        sectionsChecked = 0
-        N = len(self.map)
-        section = hash(key) % N
-
-        while (self.isFullTable[section] != "StartEmpty") and sectionsChecked < N:
-            if (self.map[section] is not None) and (self.map[section].id_number == key):
-                return self.map[section]
-
-            i += 1
-            section = (hash(key) + i ** 2) % N
-
-            sectionsChecked += 1
-
+        section = hash(key) % len(self.list)
+        sectionList = self.list[section]
+        for pair in sectionList:
+            if key == pair[0]:
+                return pair[1]
         return None
 
     def resize(self):
-        resizedMap = HashMap(initialCapacity = self.initialCapacity * 2)
+            resizedMap = HashMap(initialCapacity = self.initialCapacity * 2)
 
-        for package in self.map:
-            resizedMap.add(package)
+            for package in self.map:
+                resizedMap.insert(package)
 
-        self.initialCapacity = resizedMap.initialCapacity
-        self.map = resizedMap.map
-        self.isFullTable = resizedMap.isFullTable
+            self.initialCapacity = resizedMap.initialCapacity
+            self.map = resizedMap.map
+            self.isFullTable = resizedMap.isFullTable
+
+    def remove(self, key):
+        slot = hash(key) % len(self.list)
+        destination = self.list[slot]
+
+        if key in destination:
+            destination.remove(key)
